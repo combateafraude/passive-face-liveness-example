@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Utilizando SDK Passive Face Liveness</title>
+  <!-- Importanto SDK passive face liveness -->
+  <script src='https://repo.combateafraude.com/javascript/release/passive-face-liveness/<VERSION>/passive-face-liveness.min.js'></script>
+  <style>
+    body {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn {
+      background: #000;
+      color: #fff;
+      padding: 10px 20px;
+      cursor: pointer;
+      margin: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <a onclick="openPassiveFaceLiveness()" class="btn">
+    ABRIR REGISTRO FACIAL
+  </a>
+
+  <script>
+    var passiveFaceLivenessOptions = {
+      mobileOnly: false,
+      theme: {
+        closeButton: '#fff',
+        checkmark: '#fff',
+        loader: '#fff',
+        pictureButton: '#fff'
+      },
+      maskType: "dotted",
+    };
+
+    var token = '<TOKEN>';
+    var passiveFaceLiveness = PassiveFaceLiveness ? new PassiveFaceLiveness.initialize(token, passiveFaceLivenessOptions) : null;
+
+    passiveFaceLiveness.on('ready', () => {
+      console.log('PassiveFaceLiveness ready!');
+    });
+
+    function openPassiveFaceLiveness() {
+      passiveFaceLiveness.open().catch((err) => { console.log(err); });
+      
+      passiveFaceLiveness.on('ready', () => {
+        console.log('SDK - ready!');
+
+        passiveFaceLiveness.initPermissions()
+        .then(accepted => {
+          if (accepted) {
+            // Usuário permitiu uso da camera
+          }
+        })
+        .catch(err => {
+          // Houve um erro ao pedir acesso a camera
+        });
+      });
+
+      passiveFaceLiveness.on('finished', e => {
+        console.log('SDK - finished!');
+        console.log(e.detail);
+      });
+
+      passiveFaceLiveness.on('closed', () => {
+        console.log('SDK - closed!');
+      });
+    };
+
+  </script>
+</body>
+</html>
