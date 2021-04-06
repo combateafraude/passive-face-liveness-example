@@ -32,49 +32,37 @@
   </a>
 
   <script>
-    var passiveFaceLivenessOptions = {
+    const sdkToken = '<TOKEN>';
+    
+    const passiveFaceLivenessOptions = {
+      sdkToken: sdkToken,
       mobileOnly: false,
-      theme: {
-        closeButton: '#fff',
-        checkmark: '#fff',
-        loader: '#fff',
-        pictureButton: '#fff'
-      },
-      maskType: "dotted",
+      disableAnalytics: true,
+      hideTitle: false,
+      hideMask: false,
+      hideSwitchCameraButton: false
     };
 
-    var token = '<TOKEN>';
-    var passiveFaceLiveness = PassiveFaceLiveness ? new PassiveFaceLiveness.initialize(token, passiveFaceLivenessOptions) : null;
+    const passiveFaceLiveness = new window.PassiveFaceLivenessSdk(passiveFaceLivenessOptions);
 
-    passiveFaceLiveness.on('ready', () => {
-      console.log('PassiveFaceLiveness ready!');
-    });
+    async function openPassiveFaceLiveness() {
 
-    function openPassiveFaceLiveness() {
-      passiveFaceLiveness.open().catch((err) => { console.log(err); });
+      await passiveFaceLiveness.initialize();
+
+      // Inicia o Passive Face Liveness
+      await passiveFaceLiveness.open(
+        {},
+        document.getElementsByTagName('body')[0] // Especifica o container a qual o SDK será inserido
+      );
       
-      passiveFaceLiveness.on('ready', () => {
-        console.log('SDK - ready!');
+      const capture = await passiveFaceLiveness.captureSelfie(); // Captura a selfie
+      const selfie = capture.imageUrl; // Resultado da captura da selfie
 
-        passiveFaceLiveness.initPermissions()
-        .then(accepted => {
-          if (accepted) {
-            // Usuário permitiu uso da camera
-          }
-        })
-        .catch(err => {
-          // Houve um erro ao pedir acesso a camera
-        });
-      });
+      console.log('selfie');
+      console.log(selfie);
 
-      passiveFaceLiveness.on('finished', e => {
-        console.log('SDK - finished!');
-        console.log(e.detail);
-      });
-
-      passiveFaceLiveness.on('closed', () => {
-        console.log('SDK - closed!');
-      });
+      passiveFaceLiveness.dispose(); // Libera os recursos utilizados pelo SDK
+      passiveFaceLiveness.close(); // Finaliza o SDK
     };
 
   </script>
